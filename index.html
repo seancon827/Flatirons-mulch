@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Flatirons Mulch Delivery | Boulder County Mulch & Wood Chips</title>
+<meta name="description" content="Affordable mulch delivery and spreading in Boulder County. Serving Boulder, Niwot, Gunbarrel, Longmont, Louisville, Lafayette, and Erie, CO."/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a}
+h1,h2,h3{font-family:Georgia,serif}
+a{text-decoration:none}
+input,select,button{font-family:inherit}
+.btn-green{background:#166534;color:#fff;border:none;border-radius:6px;padding:13px 28px;font-weight:700;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn-green:hover{background:#14532d}
+.btn-outline{background:transparent;color:#fff;border:2px solid #fff;border-radius:6px;padding:11px 26px;font-weight:700;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn-outline:hover{background:rgba(255,255,255,0.12)}
+.section-tag{display:inline-block;background:#dcfce7;color:#166534;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 14px;border-radius:4px;margin-bottom:12px}
+.input{width:100%;border:1.5px solid #d1d5db;border-radius:6px;padding:10px 14px;font-size:15px}
+.input:focus{outline:none;border-color:#166534}
+select.input{background:#fff;cursor:pointer}
+nav{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:64px}
+.hero{background:linear-gradient(135deg,#0a2e0a 0%,#1a4a1a 45%,#2d5a1b 75%,#143a0a 100%);color:#fff;padding:80px 20px;text-align:center}
+.hero h1{font-size:clamp(1.9rem,5vw,3.4rem);font-weight:900;line-height:1.15;margin-bottom:20px;max-width:720px;margin-left:auto;margin-right:auto}
+.hero p{font-size:19px;color:#bbf7d0;margin-bottom:36px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:22px;margin-top:36px}
+.card{background:#fff;border:2px solid #e5e7eb;border-radius:10px;padding:26px}
+.card-hl{background:#f0fdf4;border:2px solid #166534;border-radius:10px;padding:26px}
+.review-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:22px;border-left:4px solid #166534}
+.faq-btn{width:100%;background:none;border:none;text-align:left;padding:18px 0;font-size:16px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.float-btn{position:fixed;bottom:22px;right:22px;z-index:50;background:#166534;color:#fff;border:none;border-radius:50px;padding:13px 20px;font-weight:700;font-size:15px;box-shadow:0 6px 24px rgba(22,101,52,.45);display:flex;align-items:center;gap:7px;text-decoration:none;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 6px 24px rgba(22,101,52,.4)}50%{box-shadow:0 6px 32px rgba(22,101,52,.7)}}
+.admin-overlay{position:fixed;inset:0;background:#f3f4f6;z-index:200;overflow-y:auto;padding:28px}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:#fff;border-radius:12px;padding:34px;max-width:340px;width:100%}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:10px 14px;background:#f9fafb;border-bottom:2px solid #e5e7eb;font-weight:600;color:#6b7280;font-size:13px}
+td{padding:11px 14px;border-bottom:1px solid #f3f4f6}
+.depth-opt{border:2px solid #d1d5db;background:#fff;border-radius:8px;padding:11px 6px;cursor:pointer;text-align:center;font-size:14px;flex:1}
+.depth-opt.active{border-color:#166534;background:#f0fdf4;color:#166534;font-weight:700}
+.svc-opt{border:2px solid #d1d5db;background:#fff;border-radius:8px;padding:11px 6px;cursor:pointer;text-align:center;font-size:14px;flex:1}
+.svc-opt.active{border-color:#166534;background:#f0fdf4;color:#166534;font-weight:700}
+@media(max-width:600px){.hide-mobile{display:none!important}.form-grid2{grid-template-columns:1fr!important}.form-grid3{grid-template-columns:1fr 1fr!important}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const AIRTABLE_TOKEN = "patK7kjE55Kcp9KOK.7ac6bfb26b6a94e2c817fc100656745c9b22e0c8b96bac02aaf9990104f88101";
+const AIRTABLE_BASE = "appNz7QfwVM7GNp94";
+const AIRTABLE_TABLE = "Leads";
+const PHONE = "7738440807";
+const CITIES = ["Boulder","Niwot","Gunbarrel","Longmont","Louisville","Lafayette","Erie"];
+
+async function saveToAirtable(f) {
+const l=parseFloat(f.length),w=parseFloat(f.width),d=parseFloat(f.depth);
+const fields={"First Name":f.firstName,"Last Name":f.lastName,"Phone":f.phone,"Email":f.email,"Address":f.address,"City":f.city,"Service":f.service,"Submitted At":new Date().toISOString()};
+if(l&&w){fields["Square Feet"]=Math.round(l*w);}
+if(l&&w&&d){fields["Cubic Yards"]=parseFloat(((l*w*d)/324).toFixed(2));}
+if(f.length)fields["Length (ft)"]=l;
+if(f.width)fields["Width (ft)"]=w;
+if(f.depth)fields["Depth (in)"]=d;
+await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(AIRTABLE_TABLE)}`,{method:"POST",headers:{"Authorization":`Bearer ${AIRTABLE_TOKEN}`,"Content-Type":"application/json"},body:JSON.stringify({fields})});
+}
+function saveLocal(data){try{const leads=JSON.parse(localStorage.getItem("fmd_leads")||"[]");leads.push({...data,submittedAt:new Date().toISOString()});localStorage.setItem("fmd_leads",JSON.stringify(leads));}catch(e){}}
+function getLocal(){try{return JSON.parse(localStorage.getItem("fmd_leads")||"[]");}catch{return[];}}
+function toCSV(leads){if(!leads.length)return"";const k=Object.keys(leads[0]);return[k.join(","),...leads.map(l=>k.map(key=>`"${String(l[key]||"")}"`).join(","))].join("\n");}
+
+const REVIEWS=[
+{name:"Sarah M.",city:"Boulder",text:"Incredible service! They delivered and spread mulch in my entire front yard in under two hours. My garden beds look amazing."},
+{name:"Tom & Lisa K.",city:"Niwot",text:"Best decision we made this spring. Saved us a full weekend of backbreaking work. Highly recommend for anyone in the area."},
+{name:"Derek R.",city:"Lafayette",text:"Great price, fast delivery, and the arborist chips look so natural. Our trees are much happier. Will use again every year."},
+{name:"Jenny P.",city:"Louisville",text:"They did the weed pulling add-on too and my beds look professionally done. Super friendly and easy to reach via text."},
+];
+const FAQS=[
+{q:"What is arborist mulch?",a:"Arborist mulch consists of natural wood chips from tree trimming and removal crews. It's eco-friendly, free of dyes, and excellent for moisture retention, weed suppression, and soil health."},
+{q:"How much mulch do I need?",a:"Use our Mulch Calculator! A good rule: 3 inches deep for garden beds and tree rings, 2 inches for general coverage. Our calculator gives you exact cubic yards."},
+{q:"Do you spread the mulch?",a:"Yes! Our Delivery + Spreading service includes professional installation in your beds, around trees, and throughout all landscaping areas. We also offer optional weed pulling and bed cleanup."},
+{q:"How quickly can you deliver?",a:"We typically schedule within 2–5 business days. Text us for the fastest response and we'll do our best to accommodate your timeline."},
+{q:"What areas do you serve?",a:"We serve Boulder, Niwot, Gunbarrel, Longmont, Louisville, Lafayette, and Erie, Colorado. If you're nearby, just ask!"},
+];
+
+function App() {
+const [calcL,setCalcL]=useState("");
+const [calcW,setCalcW]=useState("");
+const [calcD,setCalcD]=useState("3");
+const [calcResult,setCalcResult]=useState(null);
+const [form,setForm]=useState({firstName:"",lastName:"",phone:"",email:"",address:"",city:"",length:"",width:"",depth:"3",service:"delivery-spreading",honey:""});
+const [submitted,setSubmitted]=useState(false);
+const [loading,setLoading]=useState(false);
+const [openFaq,setOpenFaq]=useState(null);
+const [adminMode,setAdminMode]=useState(false);
+const [showLogin,setShowLogin]=useState(false);
+const [adminPass,setAdminPass]=useState("");
+const [leads,setLeads]=useState([]);
+
+useEffect(()=>{document.title="Flatirons Mulch Delivery | Boulder County";},[]);
+
+function scrollTo(id){document.getElementById(id)?.scrollIntoView({behavior:"smooth"});}
+
+function calc(){
+const l=parseFloat(calcL),w=parseFloat(calcW),d=parseFloat(calcD);
+if(!l||!w)return;
+setCalcResult({sqft:Math.round(l*w),cy:((l*w*d)/324).toFixed(2)});
+}
+
+function smsBody(){
+const name=form.firstName||"[Name]",addr=form.address||"[Address]";
+const l=parseFloat(form.length||calcL),w=parseFloat(form.width||calcW),d=parseFloat(form.depth||calcD);
+const sqft=l&&w?Math.round(l*w):"[Square Feet]";
+const cy=l&&w&&d?((l*w*d)/324).toFixed(2):"[Cubic Yards]";
+return encodeURIComponent(`Hi, my name is ${name}.\n\nMy address is ${addr}.\n\nMy landscaping area is approximately ${sqft} square feet and I need approximately ${cy} cubic yards of mulch.\n\nPlease send me a quote.`);
+}
+
+async function handleSubmit(e){
+e.preventDefault();
+if(form.honey)return;
+setLoading(true);
+try{await saveToAirtable(form);}catch(err){console.warn("Airtable:",err);}
+saveLocal(form);
+setLoading(false);
+setSubmitted(true);
+}
+
+function adminLogin(){
+if(adminPass==="flatirons2024"){setAdminMode(true);setShowLogin(false);setLeads(getLocal());}
+else alert("Incorrect password");
+}
+
+function exportCSV(){
+const blob=new Blob([toCSV(leads)],{type:"text/csv"});
+const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="flatirons_leads.csv";a.click();
+}
+
+return (
+<div>
+{/* NAV */}
+<nav>
+<div className="nav-inner">
+<div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=>scrollTo("hero")}>
+<div style={{width:34,height:34,background:"#166534",borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🌿</div>
+<div>
+<div style={{fontFamily:"Georgia,serif",fontWeight:700,fontSize:15,lineHeight:1.2}}>Flatirons Mulch</div>
+<div style={{fontSize:12,color:"#166534"}}>Boulder County, CO</div>
+</div>
+</div>
+<div style={{display:"flex",alignItems:"center",gap:22}}>
+{[["Services","services"],["Calculator","calculator"],["Quote","quote"],["Reviews","reviews"],["FAQ","faq"]].map(([l,id])=>(
+<button key={id} className="hide-mobile" onClick={()=>scrollTo(id)} style={{background:"none",border:"none",fontWeight:500,fontSize:15,color:"#4b5563",cursor:"pointer"}}>{l}</button>
+))}
+<a href={`tel:${PHONE}`} className="btn-green" style={{padding:"9px 18px",fontSize:14}}>📞 Call Now</a>
+</div>
+</div>
+</nav>
+
+{/* HERO */}
+<section id="hero" className="hero">
+<div style={{maxWidth:740,margin:"0 auto"}}>
+<div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:20,padding:"6px 18px",fontSize:14,marginBottom:24}}>
+📍 Serving Boulder County, CO
+</div>
+<h1>Affordable Mulch Delivery & Spreading in Boulder County</h1>
+<p>We haul, deliver, and spread natural wood chip mulch so you don't have to.</p>
+<div style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap",marginBottom:28}}>
+<button className="btn-green" style={{padding:"14px 30px",fontSize:16}} onClick={()=>scrollTo("quote")}>Get Free Quote</button>
+<a href={`sms:${PHONE}?body=${smsBody()}`} className="btn-outline" style={{padding:"12px 28px",fontSize:16}}>💬 Text Us Now</a>
+</div>
+<div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:8}}>
+{CITIES.map(c=><span key={c} style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:20,padding:"4px 14px",fontSize:13}}>{c}</span>)}
+</div>
+</div>
+</section>
+
+{/* WHY BAR */}
+<div style={{background:"#f3f4f6",borderBottom:"1px solid #e5e7eb",padding:"28px 20px"}}>
+<div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))",gap:20,textAlign:"center"}}>
+{[["🌿","Eco-Friendly","100% natural arborist chips"],["🚛","Full Service","Pickup, delivery & spreading"],["⏱️","Fast Turnaround","Typically 2–5 business days"],["💬","Text-Friendly","Easy quotes via text"]].map(([icon,title,sub])=>(
+<div key={title}><div style={{fontSize:30,marginBottom:8}}>{icon}</div><div style={{fontWeight:700,fontSize:15,marginBottom:4}}>{title}</div><div style={{fontSize:13,color:"#6b7280"}}>{sub}</div></div>
+))}
+</div>
+</div>
+
+{/* SERVICES */}
+<section id="services" style={{padding:"70px 20px"}}>
+<div style={{maxWidth:1100,margin:"0 auto",textAlign:"center"}}>
+<span className="section-tag">Our Services</span>
+<h2 style={{fontSize:"clamp(1.6rem,4vw,2.5rem)",fontWeight:900,marginBottom:10}}>Everything Your Yard Needs</h2>
+<p style={{color:"#6b7280",fontSize:16,lineHeight:1.6}}>From pickup to final installation — we handle the heavy lifting.</p>
+<div className="card-grid">
+{[
+{icon:"🚛",tag:"Delivery",title:"Mulch Delivery",desc:"We source and pick up natural arborist mulch from local tree crews and deliver it right to your property. No bags, no store trips.",hl:false},
+{icon:"🌱",tag:"Most Popular",title:"Delivery + Spreading",desc:"We deliver AND professionally spread mulch in garden beds, around trees, and throughout all landscaping areas.",hl:true},
+{icon:"✂️",tag:"Optional Add-On",title:"Yard Refresh",desc:"Complement your mulch with weed pulling, bed cleanup, and edge touch-ups for a truly finished, professional look.",hl:false},
+].map(s=>(
+<div key={s.title} className={s.hl?"card-hl":"card"} style={{textAlign:"left"}}>
+<div style={{fontSize:38,marginBottom:14}}>{s.icon}</div>
+<div style={{fontSize:12,fontWeight:700,color:"#166534",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:6}}>{s.tag}</div>
+<h3 style={{fontSize:21,fontWeight:700,marginBottom:10}}>{s.title}</h3>
+<p style={{color:"#4b5563",fontSize:15,lineHeight:1.7,marginBottom:18}}>{s.desc}</p>
+<button style={{background:"none",border:"none",color:"#166534",fontWeight:700,fontSize:14,cursor:"pointer",padding:0}} onClick={()=>scrollTo("quote")}>Get a Quote →</button>
+</div>
+))}
+</div>
+</div>
+</section>
+
+{/* SERVICE AREA */}
+<section style={{background:"#111827",color:"#fff",padding:"60px 20px",textAlign:"center"}}>
+<div style={{maxWidth:700,margin:"0 auto"}}>
+<span style={{display:"inline-block",background:"rgba(255,255,255,0.1)",color:"#86efac",fontSize:12,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",padding:"4px 14px",borderRadius:4,marginBottom:12}}>Service Area</span>
+<h2 style={{fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:900,color:"#fff",marginBottom:10}}>Serving All of Boulder County</h2>
+<p style={{color:"#9ca3af",marginBottom:24}}>If your city isn't listed, reach out — we often accommodate nearby areas.</p>
+<div>{CITIES.map(c=><span key={c} style={{display:"inline-block",background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",color:"#86efac",fontSize:13,fontWeight:600,padding:"5px 14px",borderRadius:20,margin:4}}>📍 {c}, CO</span>)}</div>
+</div>
+</section>
+
+{/* CALCULATOR */}
+<section id="calculator" style={{padding:"70px 20px"}}>
+<div style={{maxWidth:620,margin:"0 auto"}}>
+<div style={{textAlign:"center",marginBottom:32}}>
+<span className="section-tag">Free Tool</span>
+<h2 style={{fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:900,marginBottom:8}}>Mulch Calculator</h2>
+<p style={{color:"#6b7280",fontSize:16}}>Find out exactly how much mulch you need.</p>
+</div>
+<div style={{background:"#f9fafb",border:"1px solid #e5e7eb",borderRadius:12,padding:32}}>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+<div><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>Length (ft)</label><input className="input" type="number" min="0" placeholder="e.g. 20" value={calcL} onChange={e=>setCalcL(e.target.value)}/></div>
+<div><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>Width (ft)</label><input className="input" type="number" min="0" placeholder="e.g. 10" value={calcW} onChange={e=>setCalcW(e.target.value)}/></div>
+</div>
+<label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:8}}>Desired Depth</label>
+<div style={{display:"flex",gap:10,marginBottom:20}}>
+{[["2","2 in (light)"],["3","3 in (recommended)"],["4","4 in (thick)"]].map(([v,l])=>(
+<div key={v} className={`depth-opt${calcD===v?" active":""}`} onClick={()=>setCalcD(v)}>{l}</div>
+))}
+</div>
+<button className="btn-green" style={{width:"100%",justifyContent:"center",padding:"14px",fontSize:16}} onClick={calc}>Calculate My Mulch Needs</button>
+{calcResult && (
+<div style={{background:"linear-gradient(135deg,#0a2e0a,#166534)",color:"#fff",borderRadius:10,padding:26,marginTop:18}}>
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,textAlign:"center",marginBottom:18}}>
+<div><div style={{fontSize:36,fontWeight:900}}>{calcResult.sqft.toLocaleString()}</div><div style={{color:"#86efac",fontSize:14,marginTop:4}}>Square Feet</div></div>
+<div><div style={{fontSize:36,fontWeight:900}}>{calcResult.cy}</div><div style={{color:"#86efac",fontSize:14,marginTop:4}}>Cubic Yards Needed</div></div>
+</div>
+<p style={{textAlign:"center",color:"#bbf7d0",fontSize:15,marginBottom:14}}>We recommend {calcResult.cy} cubic yards for your space.</p>
+<div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+<button className="btn-outline" onClick={()=>scrollTo("quote")}>Get Quote</button>
+<a href={`sms:${PHONE}?body=${smsBody()}`} className="btn-outline">💬 Text for Quote</a>
+</div>
+</div>
+)}
+</div>
+</div>
+</section>
+
+{/* QUOTE FORM */}
+<section id="quote" style={{padding:"70px 20px",background:"#f9fafb"}}>
+<div style={{maxWidth:620,margin:"0 auto"}}>
+<div style={{textAlign:"center",marginBottom:32}}>
+<span className="section-tag">Free Estimate</span>
+<h2 style={{fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:900,marginBottom:8}}>Get Your Free Quote</h2>
+<p style={{color:"#6b7280",fontSize:16}}>We'll review your details and reach out with pricing.</p>
+</div>
+{submitted ? (
+<div style={{textAlign:"center",background:"#fff",border:"2px solid #166534",borderRadius:12,padding:56}}>
+<div style={{fontSize:54,marginBottom:14}}>✅</div>
+<h3 style={{fontSize:24,color:"#166534",marginBottom:10}}>Thank You!</h3>
+<p style={{fontSize:17,color:"#4b5563"}}>We will contact you shortly with a quote.</p>
+<button className="btn-green" style={{marginTop:22,fontSize:14,padding:"10px 20px"}} onClick={()=>setSubmitted(false)}>Submit another request</button>
+</div>
+) : (
+<form onSubmit={handleSubmit} style={{background:"#fff",border:"1px solid #e5e7eb",borderRadius:12,padding:32}}>
+<input type="text" value={form.honey} onChange={e=>setForm({...form,honey:e.target.value})} style={{display:"none"}} tabIndex={-1}/>
+<div className="form-grid2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+<div><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>First Name *</label><input required className="input" value={form.firstName} onChange={e=>setForm({...form,firstName:e.target.value})}/></div>
+<div><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>Last Name *</label><input required className="input" value={form.lastName} onChange={e=>setForm({...form,lastName:e.target.value})}/></div>
+</div>
+<div className="form-grid2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+<div><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>Phone *</label><input required type="tel" className="input" placeholder="(773) 844-0807" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></div>
+<div><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>Email *</label><input required type="email" className="input" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/></div>
+</div>
+<div style={{marginBottom:14}}><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>Property Address *</label><input required className="input" placeholder="123 Main St" value={form.address} onChange={e=>setForm({...form,address:e.target.value})}/></div>
+<div style={{marginBottom:14}}><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>City *</label>
+<select required className="input" value={form.city} onChange={e=>setForm({...form,city:e.target.value})}>
+<option value="">Select city...</option>
+{CITIES.map(c=><option key={c}>{c}</option>)}
+<option value="Other">Other</option>
+</select>
+</div>
+<div className="form-grid3" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:14,marginBottom:14}}>
+<div><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>Length (ft)</label><input type="number" min="0" className="input" placeholder="20" value={form.length} onChange={e=>setForm({...form,length:e.target.value})}/></div>
+<div><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>Width (ft)</label><input type="number" min="0" className="input" placeholder="10" value={form.width} onChange={e=>setForm({...form,width:e.target.value})}/></div>
+<div><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:6}}>Depth</label>
+<select className="input" value={form.depth} onChange={e=>setForm({...form,depth:e.target.value})}>
+<option value="2">2 inches</option><option value="3">3 inches</option><option value="4">4 inches</option>
+</select>
+</div>
+</div>
+<div style={{marginBottom:18}}><label style={{display:"block",fontSize:14,fontWeight:600,marginBottom:8}}>Service Requested *</label>
+<div style={{display:"flex",gap:12}}>
+{[["delivery","Delivery Only"],["delivery-spreading","Delivery + Spreading"]].map(([v,l])=>(
+<div key={v} className={`svc-opt${form.service===v?" active":""}`} onClick={()=>setForm({...form,service:v})}>{l}</div>
+))}
+</div>
+</div>
+<button type="submit" className="btn-green" disabled={loading} style={{width:"100%",justifyContent:"center",padding:"15px",fontSize:16,opacity:loading?0.7:1}}>
+{loading?"Submitting...":"Submit Quote Request"}
+</button>
+<p style={{fontSize:13,color:"#9ca3af",textAlign:"center",marginTop:10}}>No spam. We'll only contact you about your quote.</p>
+</form>
+)}
+<div style={{textAlign:"center",marginTop:24}}>
+<p style={{color:"#6b7280",fontSize:15,marginBottom:12}}>Prefer to text? Send your info directly:</p>
+<a href={`sms:${PHONE}?body=${smsBody()}`} className="btn-green" style={{display:"inline-flex",textDecoration:"none"}}>💬 Open Pre-Filled Text Message</a>
+</div>
+</div>
+</section>
+
+{/* REVIEWS */}
+<section id="reviews" style={{padding:"70px 20px"}}>
+<div style={{maxWidth:1100,margin:"0 auto"}}>
+<div style={{textAlign:"center",marginBottom:36}}>
+<span className="section-tag">Testimonials</span>
+<h2 style={{fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:900}}>What Customers Are Saying</h2>
+</div>
+<div className="card-grid">
+{REVIEWS.map((r,i)=>(
+<div key={i} className="review-card">
+<div style={{color:"#f59e0b",fontSize:18,marginBottom:10}}>★★★★★</div>
+<p style={{color:"#374151",lineHeight:1.7,marginBottom:16,fontSize:15}}>"{r.text}"</p>
+<div style={{display:"flex",alignItems:"center",gap:10}}>
+<div style={{width:36,height:36,background:"#166534",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700}}>{r.name[0]}</div>
+<div><div style={{fontWeight:700,fontSize:14}}>{r.name}</div><div style={{fontSize:13,color:"#9ca3af"}}>{r.city}, CO</div></div>
+</div>
+</div>
+))}
+</div>
+</div>
+</section>
+
+{/* FAQ */}
+<section id="faq" style={{padding:"70px 20px",background:"#f9fafb"}}>
+<div style={{maxWidth:660,margin:"0 auto"}}>
+<div style={{textAlign:"center",marginBottom:36}}>
+<span className="section-tag">FAQ</span>
+<h2 style={{fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:900}}>Common Questions</h2>
+</div>
+{FAQS.map((f,i)=>(
+<div key={i} style={{borderBottom:"1px solid #e5e7eb"}}>
+<button className="faq-btn" onClick={()=>setOpenFaq(openFaq===i?null:i)}>
+<span>{f.q}</span><span style={{color:"#166534",fontSize:22}}>{openFaq===i?"−":"+"}</span>
+</button>
+{openFaq===i && <div style={{paddingBottom:18,fontSize:15,color:"#4b5563",lineHeight:1.7}}>{f.a}</div>}
+</div>
+))}
+</div>
+</section>
+
+{/* CTA */}
+<section style={{background:"#14532d",color:"#fff",padding:"60px 20px",textAlign:"center"}}>
+<div style={{maxWidth:580,margin:"0 auto"}}>
+<h2 style={{fontSize:"clamp(1.6rem,4vw,2.4rem)",fontWeight:900,color:"#fff",marginBottom:12}}>Ready to Transform Your Yard?</h2>
+<p style={{color:"#bbf7d0",marginBottom:30,fontSize:16,lineHeight:1.6}}>Get a free quote in minutes. Serving all of Boulder County.</p>
+<div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+<button style={{...{},background:"#fff",color:"#166534",border:"none",borderRadius:6,padding:"13px 26px",fontWeight:700,fontSize:15,cursor:"pointer"}} onClick={()=>scrollTo("quote")}>Get Free Quote</button>
+<a href={`sms:${PHONE}?body=${smsBody()}`} className="btn-outline">💬 Text for a Quote</a>
+<a href={`tel:${PHONE}`} className="btn-outline">📞 Call Us</a>
+</div>
+</div>
+</section>
+
+{/* FOOTER */}
+<footer style={{background:"#111827",color:"#9ca3af",padding:"44px 20px 22px"}}>
+<div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:36,marginBottom:32}}>
+<div>
+<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+<div style={{width:30,height:30,background:"#166534",borderRadius:6,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>🌿</div>
+<span style={{color:"#fff",fontWeight:700,fontFamily:"Georgia,serif"}}>Flatirons Mulch Delivery</span>
+</div>
+<p style={{fontSize:13,lineHeight:1.7}}>Eco-friendly arborist wood chip mulch delivery and spreading for Boulder County homeowners.</p>
+</div>
+<div>
+<div style={{color:"#fff",fontWeight:600,fontSize:15,marginBottom:12}}>Service Areas</div>
+{CITIES.map(c=><div key={c} style={{fontSize:14,marginBottom:6}}>{c}, CO</div>)}
+</div>
+<div>
+<div style={{color:"#fff",fontWeight:600,fontSize:15,marginBottom:12}}>Contact</div>
+<a href={`tel:${PHONE}`} style={{display:"flex",alignItems:"center",gap:8,color:"#9ca3af",textDecoration:"none",marginBottom:10,fontSize:14}}>📞 (773) 844-0807</a>
+<a href={`sms:${PHONE}?body=${smsBody()}`} style={{display:"flex",alignItems:"center",gap:8,color:"#9ca3af",textDecoration:"none",fontSize:14}}>💬 Text for a Quote</a>
+<div style={{marginTop:18,fontSize:12,lineHeight:1.8,color:"#6b7280"}}>Mulch Delivery Boulder · Wood Chips Boulder<br/>Mulch Spreading Boulder County</div>
+</div>
+</div>
+<div style={{maxWidth:1100,margin:"0 auto",borderTop:"1px solid #1f2937",paddingTop:18,display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:13,flexWrap:"wrap",gap:8}}>
+<span>© {new Date().getFullYear()} Flatirons Mulch Delivery. All rights reserved.</span>
+<button style={{background:"none",border:"none",color:"#4b5563",cursor:"pointer",fontSize:13}} onClick={()=>setShowLogin(true)}>Admin</button>
+</div>
+</footer>
+
+{/* FLOAT BTN */}
+<a href={`sms:${PHONE}?body=${smsBody()}`} className="float-btn">💬 Text a Quote</a>
+
+{/* ADMIN LOGIN */}
+{showLogin && (
+<div className="modal-bg">
+<div className="modal-box">
+<h3 style={{fontFamily:"Georgia,serif",fontSize:21,marginBottom:18}}>Admin Login</h3>
+<input type="password" className="input" style={{marginBottom:14}} placeholder="Password" value={adminPass} onChange={e=>setAdminPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&adminLogin()}/>
+<div style={{display:"flex",gap:10}}>
+<button className="btn-green" style={{flex:1,justifyContent:"center"}} onClick={adminLogin}>Login</button>
+<button style={{border:"1px solid #d1d5db",borderRadius:6,padding:"10px 16px",cursor:"pointer",background:"#fff"}} onClick={()=>setShowLogin(false)}>Cancel</button>
+</div>
+</div>
+</div>
+)}
+
+{/* ADMIN PANEL */}
+{adminMode && (
+<div className="admin-overlay">
+<div style={{maxWidth:980,margin:"0 auto"}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
+<h2 style={{fontFamily:"Georgia,serif",fontSize:24}}>Lead Dashboard</h2>
+<div style={{display:"flex",gap:10}}>
+<button className="btn-green" style={{padding:"9px 18px",fontSize:14}} onClick={exportCSV}>⬇️ Export CSV</button>
+<button style={{border:"1px solid #d1d5db",borderRadius:6,padding:"9px 16px",cursor:"pointer",background:"#fff"}} onClick={()=>setAdminMode(false)}>Close</button>
+</div>
+</div>
+<div style={{background:"#fff",border:"1px solid #e5e7eb",borderRadius:10,overflow:"hidden"}}>
+{leads.length===0 ? (
+<div style={{padding:56,textAlign:"center",color:"#9ca3af"}}>No leads yet. Submissions will appear here.</div>
+) : (
+<div style={{overflowX:"auto"}}>
+<table>
+<thead><tr>{["Date","Name","Phone","Email","City","Service","Sq Ft"].map(h=><th key={h}>{h}</th>)}</tr></thead>
+<tbody>
+{leads.map((l,i)=>{
+const sqft=l.length&&l.width?Math.round(parseFloat(l.length)*parseFloat(l.width)):"–";
+return(
+<tr key={i} style={{background:i%2?"#f9fafb":"#fff"}}>
+<td>{new Date(l.submittedAt).toLocaleDateString()}</td>
+<td style={{fontWeight:600}}>{l.firstName} {l.lastName}</td>
+<td><a href={`tel:${l.phone}`} style={{color:"#166534"}}>{l.phone}</a></td>
+<td>{l.email}</td><td>{l.city}</td><td>{l.service}</td><td>{sqft}</td>
+</tr>
+);
+})}
+</tbody>
+</table>
+</div>
+)}
+</div>
+<p style={{fontSize:13,color:"#9ca3af",textAlign:"center",marginTop:10}}>Admin password: flatirons2024</p>
+</div>
+</div>
+)}
+</div>
+);
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+</body>
+</html>
